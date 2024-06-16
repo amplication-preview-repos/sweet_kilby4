@@ -1,0 +1,54 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model GroupChat {
+  createdAt   DateTime  @default(now())
+  description String?
+  id          String    @id @default(cuid())
+  messages    Message[]
+  name        String?
+  updatedAt   DateTime  @updatedAt
+  users       User[]
+}
+
+model PrivateChat {
+  createdAt DateTime  @default(now())
+  id        String    @id @default(cuid())
+  messages  Message[]
+  updatedAt DateTime  @updatedAt
+  user1     String?
+  user2     String?
+}
+
+model Message {
+  content       String?
+  createdAt     DateTime     @default(now())
+  groupChat     GroupChat?   @relation(fields: [groupChatId], references: [id])
+  groupChatId   String?
+  id            String       @id @default(cuid())
+  privateChat   PrivateChat? @relation(fields: [privateChatId], references: [id])
+  privateChatId String?
+  sender        String?
+  timestamp     DateTime?
+  updatedAt     DateTime     @updatedAt
+}
+
+model User {
+  createdAt   DateTime   @default(now())
+  email       String?    @unique
+  firstName   String?
+  groupChat   GroupChat? @relation(fields: [groupChatId], references: [id])
+  groupChatId String?
+  id          String     @id @default(cuid())
+  lastName    String?
+  password    String
+  roles       Json
+  updatedAt   DateTime   @updatedAt
+  username    String     @unique
+}
